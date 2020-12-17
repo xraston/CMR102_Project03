@@ -19,7 +19,7 @@ public class ColourChange : MonoBehaviour
     // references to the different cooking times
     public float timeToCook; // how long it takes to cook
     public float flipTime; // how long until the steak should be turned over
-    private float mediumTexture = 540; // interpolation of the timer to texture change 
+    private float mediumTexture = 300; // interpolation of the timer to texture change 
 
     public enum CookingState { Blue, Rare, MediumRare, Medium, MediumWell, WellDone } // the different steak cooking states
     public CookingState currentCookingState; // the current state the steak will be in
@@ -52,7 +52,7 @@ public class ColourChange : MonoBehaviour
 
         if (timer < timeToCook) // if the timer goes past the selected cooking time
         {
-            if (timer <= 540)
+            if (timer <= 300)
             {
                 color.g += timer / mediumTexture; // changes the texture's colour value according to the timer
                 color.b += timer / mediumTexture;
@@ -61,7 +61,7 @@ public class ColourChange : MonoBehaviour
             }
             if (currentCookingState == CookingState.MediumWell || currentCookingState == CookingState.WellDone)
             {
-                if (timer > 540)
+                if (timer > 300)
                 {
                     color = Color.Lerp(colorMedium, colorWellDone, timer / timeToCook);
                 }
@@ -139,40 +139,65 @@ public class ColourChange : MonoBehaviour
         {
             case CookingState.Blue:
                 {
-                    timeToCook = 180; // 3 minutes both sides
-                    flipTime = 90;
+                    timeToCook = 120; // 2 minutes both sides
+                    flipTime = 60;
                     break;
                 }
             case CookingState.Rare: 
+                {
+                    timeToCook = 180; // 3 minutes
+                    flipTime = 90;
+                    break;
+                }
+            case CookingState.MediumRare: 
+                {
+                    timeToCook = 240; // 4 minutes
+                    flipTime = 120;
+                    break;
+                }
+            case CookingState.Medium: 
                 {
                     timeToCook = 300; // 5 minutes
                     flipTime = 150;
                     break;
                 }
-            case CookingState.MediumRare: 
+            case CookingState.MediumWell: // 6 minutes
                 {
-                    timeToCook = 420; // 7 minutes
-                    flipTime = 210;
+                    timeToCook = 360;
+                    flipTime = 180;
                     break;
                 }
-            case CookingState.Medium: 
+            case CookingState.WellDone: // 8 minutes
                 {
-                    timeToCook = 540; // 9 minutes
-                    flipTime = 270;
-                    break;
-                }
-            case CookingState.MediumWell: // 11 minutes
-                {
-                    timeToCook = 660;
-                    flipTime = 330;
-                    break;
-                }
-            case CookingState.WellDone: // 13 minutes
-                {
-                    timeToCook = 780;
-                    flipTime =390;
+                    timeToCook = 480;
+                    flipTime = 240;
                     break;
                 }
         }
+    }
+
+    public void CookBlue()
+    {
+        currentCookingState = CookingState.Blue;
+    }
+    public void CookRare()
+    {
+        currentCookingState = CookingState.Rare;
+    }
+    public void CookMediumRare()
+    {
+        currentCookingState = CookingState.MediumRare;
+    }
+    public void CookMedium()
+    {
+        currentCookingState = CookingState.Medium;
+    }
+    public void CookMediumWell()
+    {
+        currentCookingState = CookingState.MediumWell;
+    }
+    public void CookWellDone()
+    {
+        currentCookingState = CookingState.WellDone;
     }
 }
