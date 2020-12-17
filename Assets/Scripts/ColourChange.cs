@@ -4,9 +4,6 @@ using UnityEngine;
 
 public class ColourChange : MonoBehaviour
 {
-    // public GameObject steakOutside;
-    // public GameObject steakInside;
-
     Renderer m_Renderer;
     private Color color = Color.red;
 
