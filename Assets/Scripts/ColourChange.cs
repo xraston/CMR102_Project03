@@ -8,10 +8,16 @@ public class ColourChange : MonoBehaviour
     Renderer m_Renderer; // this object's renderer
     private Color color = Color.red; // sets the default starting colour to red
 
-    public Color colorMedium;
+    public Color colorMedium; // colour change from medium to well done
     public Color colorWellDone;
 
+    public AudioSource alert; // a digital alert sound
+
     public Text timerText; // the UI text that shows the timer
+    public GameObject flipText; // text to indicate when to flip the steak
+    public GameObject startText; // text to indicate how to start the timer
+    public GameObject finishText; // text to indicate when cooking is finished
+    public Text selectionText; // text to show what cooking length was selected
 
     public float timer = 0; // sets the timer start value
     public bool timerIsRunning = false; // sets the timer to stop by default 
@@ -30,6 +36,9 @@ public class ColourChange : MonoBehaviour
     {
         m_Renderer = GetComponent<Renderer>(); // gets the object's renderer
         m_Renderer.material.color = color; // assigns the object's colour
+        flipText.SetActive(false); // sets the help text to off
+        startText.SetActive(true); // sets the start text to on
+        finishText.SetActive(false); // sets the finish text to off
     }
 
     // Update is called once per frame
@@ -39,6 +48,7 @@ public class ColourChange : MonoBehaviour
         ChangeColour();
         StartTimer();
         DisplayTime(timer);
+        HelpText();
     }
 
     /// <summary>
@@ -50,7 +60,7 @@ public class ColourChange : MonoBehaviour
         color.g = 0;
         color.b = 0;
 
-        if (timer < timeToCook) // if the timer goes past the selected cooking time
+        if (timer <= timeToCook) // if the timer goes past the selected cooking time
         {
             if (timer <= 300)
             {
@@ -79,11 +89,6 @@ public class ColourChange : MonoBehaviour
         if (timerIsRunning == true)
         {
             timer += Time.deltaTime;
-            if(timer > flipTime)
-            {
-                // Debug.Log("Turn over the Steak now!");
-                // could add an animation and wait for touch input the flip the steak?
-            }
             if (timer > timeToCook) // time to cook is set by the cooking state enum
             {
                 // Debug.Log("Time has run out!");
@@ -113,6 +118,8 @@ public class ColourChange : MonoBehaviour
     public void StartButton()
     {
         timerIsRunning = true;
+        startText.SetActive(false); // turns off the start text
+        alert.Play(0); // plays the alert sound
     }
 
     /// <summary>
@@ -131,7 +138,7 @@ public class ColourChange : MonoBehaviour
     }
 
     /// <summary>
-    ///  Update the states to match the selected cooking length
+    ///  The different cooking states and their timer lengths
     /// </summary>
     private void SteakStateSelector()
     {
@@ -176,28 +183,39 @@ public class ColourChange : MonoBehaviour
         }
     }
 
-    public void CookBlue()
+    /// <summary>
+    /// Updates the UI help text elements
+    /// </summary>
+    public void HelpText()
     {
-        currentCookingState = CookingState.Blue;
-    }
-    public void CookRare()
-    {
-        currentCookingState = CookingState.Rare;
-    }
-    public void CookMediumRare()
-    {
-        currentCookingState = CookingState.MediumRare;
-    }
-    public void CookMedium()
-    {
-        currentCookingState = CookingState.Medium;
-    }
-    public void CookMediumWell()
-    {
-        currentCookingState = CookingState.MediumWell;
-    }
-    public void CookWellDone()
-    {
-        currentCookingState = CookingState.WellDone;
+        // sets the text to the selected cooking method a display the cooking time in minutes
+        selectionText.text = "A " + currentCookingState + " steak will cook in " + (timeToCook / 60) + " minutes";
+
+        if(timer > flipTime) // once the time reaches half way
+        {
+            flipText.SetActive(true);
+
+            if (alert.isPlaying == false)
+            {
+                alert.Play(); // plays the alert sound
+            }
+
+            if (timer > flipTime + 10) // displays the flip text for 20 seconds
+            {
+                flipText.SetActive(false); // then turns it off again
+                if (alert.isPlaying == true)
+                {
+                    alert.Pause(); // plays the alert sound
+                }
+            }
+        }
+        if(timer == timeToCook) // once the timer is complete
+        {
+            finishText.SetActive(true); // turns on the text prompt that the cooking is complete
+            if (alert.isPlaying == false)
+            {
+                alert.Play(); // plays the alert sound
+            }
+        }
     }
 }
